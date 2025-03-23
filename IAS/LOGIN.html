@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background-color: #cdd1d7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 20em;
+            height: 15em;
+            padding: 20px;
+            border-radius: 2em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .info-container input {
+            height: 2em;
+            width: 20em;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .button-cont button {
+            background-color: #262434;
+            height: 3em;
+            width: 21.5em;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login UI -->
+    <div class="login-container">
+        <div class="info-container">
+            <label for="username">ID</label>
+            <input type="text" placeholder="e.g 123456" id="username">
+        </div>
+        <div class="info-container">
+            <label for="passwords">Password</label>
+            <input type="password" placeholder="************" id="passwords">
+        </div>
+        <div class="button-cont">
+            <button id="login-btn">Login</button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1mo1I8KEXOWrrbad_ITE0z-wM5fIueDY",
+            authDomain: "iasdb-b56c8.firebaseapp.com",
+            projectId: "iasdb-b56c8",
+            storageBucket: "iasdb-b56c8.firebasestorage.app",
+            messagingSenderId: "1035364535383",
+            appId: "1:1035364535383:web:504911504c73d52fe86712",
+            measurementId: "G-WY6WMMN571",
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to fetch all user documents from the Accounts collection
+        async function fetchAccounts() {
+            const querySnapshot = await getDocs(collection(db, "Accounts"));
+            const data = [];
+            querySnapshot.forEach((doc) => {
+                data.push({ id: doc.id, ...doc.data() });
+            });
+            return data;
+        }
+
+        // Function to handle login
+        async function Logins() {
+            const usernameInput = document.getElementById("username").value.trim().toLowerCase(); // Trim and lowercase
+            const passwordInput = document.getElementById("passwords").value.trim(); // Trim
+
+            console.log("Attempting login...");
+
+            try {
+                const usersData = await fetchAccounts();
+                console.log("Fetched users data:", usersData);
+
+                const user = usersData.find(user => user.UID.trim().toLowerCase() === usernameInput); // Trim and lowercase
+                if (user) {
+                    if (user.Password === passwordInput) { // Correct comparison
+                        console.log("Login successful!");
+                        alert("Login successful!");
+                        window.location.href = "Home.html";
+                    } else {
+                        alert("Incorrect password.");
+                    }
+                } else {
+                    alert("User not found.");
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                alert("An error occurred during login. Please try again.");
+            }
+        }
+
+        // Bind login button to the function
+        document.getElementById("login-btn").addEventListener("click", Logins);
+    </script>
+</body>
+
+</html>
